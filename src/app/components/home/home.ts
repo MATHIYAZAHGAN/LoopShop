@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 interface Product {
   id: number;
   name: string;
@@ -27,8 +27,23 @@ interface Category {
 })
 export class Home {
 
+  constructor(private router:Router, @Inject(PLATFORM_ID) private platformId: Object){
+    this.loadUserData();
+  }
 
-constructor(private router:Router){}
+  ngOnInit() {
+    this.loadUserData();
+  }
+
+  loadUserData() {
+    if (isPlatformBrowser(this.platformId)) {
+      const googleUser = localStorage.getItem('googleUser');
+      if (googleUser) {
+        this.user = JSON.parse(googleUser);
+        this.isLoggedIn = true;
+      }
+    }
+  }
 
 
 
@@ -64,32 +79,30 @@ constructor(private router:Router){}
   }
 
 
-  isCardOpen = false; // Controls card visibility
-  isLoggedIn = false; // Simulate login state
-  user = {
-    name: 'John Doe',
-    email: 'john@example.com'
+  isCardOpen = false;
+  isLoggedIn = false;
+  user: any = {
+    name: '',
+    email: '',
+    picture: ''
   };
 
   toggleAccountCard() {
     this.isCardOpen = !this.isCardOpen;
-
-
-    console.log("checking 1234567")
   }
 
   login() {
-    this.isLoggedIn = false;
-
-    if(!this.isLoggedIn){
-      this.router.navigate(['/login'])
-    }
-    this.isCardOpen = true;
+    this.router.navigate(['/login']);
+    this.isCardOpen = false;
   }
 
   logout() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('googleUser');
+    }
     this.isLoggedIn = false;
     this.isCardOpen = false;
+    this.user = { name: '', email: '', picture: '' };
   }
 
 

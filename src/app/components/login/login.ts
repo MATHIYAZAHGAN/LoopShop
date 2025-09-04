@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
@@ -32,8 +32,9 @@ export class Login {
 
 
 
+constructor(@Inject(PLATFORM_ID) private platformId: Object, private router: Router) {}
 
-  constructor(private router:Router){}
+  // constructor(private router:Router,){}
  isLoginMode = true;
   isLoading = false;
   showPassword = false;
@@ -274,12 +275,16 @@ export class Login {
         console.log('========================');
         
         // Store user data (optional)
-        localStorage.setItem('googleUser', JSON.stringify({
-          name: payload.name,
-          email: payload.email,
-          picture: payload.picture,
-          id: payload.sub
-        }));
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.setItem('googleUser', JSON.stringify({
+      name: payload.name,
+      email: payload.email,
+      picture: payload.picture,
+      id: payload.sub
+    }));
+  }
+
+
         
       } catch (error) {
         console.error('Error decoding JWT token:', error);

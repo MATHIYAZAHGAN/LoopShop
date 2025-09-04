@@ -33,7 +33,8 @@
               </button>
               <div class="profile-wrapper">
                 <button class="nav-btn profile-btn" (click)="toggleAccountCard()">
-                  <span class="icon">👤</span>
+                  <img *ngIf="isLoggedIn && user.picture" [src]="user.picture" class="profile-pic" alt="Profile">
+                  <span *ngIf="!isLoggedIn || !user.picture" class="icon">👤</span>
                   <span class="label">Account</span>
                 </button>
                 <div class="account-card" *ngIf="isCardOpen">
