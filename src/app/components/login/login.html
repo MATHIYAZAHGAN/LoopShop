@@ -1,0 +1,330 @@
+  <div class="auth-container">
+      <!-- Background Elements -->
+      <div class="auth-background">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+        <div class="floating-elements">
+          <div class="floating-element" *ngFor="let item of floatingElements" 
+               [style.left.%]="item.x" 
+               [style.top.%]="item.y"
+               [style.animation-delay.s]="item.delay">
+            {{item.icon}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <header class="auth-header">
+        <div class="header-content">
+          <div class="logo" (click)="goHome()">
+            <h1>StyleHub</h1>
+          </div>
+          <div class="header-nav">
+            <span class="nav-text">{{isLoginMode ? "Don't have an account?" : "Already have an account?"}}</span>
+            <button class="switch-btn" (click)="toggleMode()">
+              {{isLoginMode ? 'Sign Up' : 'Sign In'}}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="auth-main">
+        <div class="auth-card">
+          <!-- Login Form -->
+          <div class="auth-form" [class.hidden]="!isLoginMode" *ngIf="isLoginMode">
+            <div class="form-header">
+              <h2 class="form-title">Welcome Back!</h2>
+              <p class="form-subtitle">Sign in to continue your shopping journey</p>
+            </div>
+
+            <form class="login-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="input-group">
+                  <span class="input-icon">📧</span>
+                  <input 
+                    type="email" 
+                    class="form-input"
+                    placeholder="Enter your email"
+                    [(ngModel)]="loginData.email"
+                    name="email"
+                    required
+                    email
+                    #emailInput="ngModel"
+                  >
+                </div>
+                <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
+                  <span *ngIf="emailInput.errors?.['required']">Email is required</span>
+                  <span *ngIf="emailInput.errors?.['email']">Please enter a valid email</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-icon">🔒</span>
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-input"
+                    placeholder="Enter your password"
+                    [(ngModel)]="loginData.password"
+                    name="password"
+                    required
+                    minlength="6"
+                    #passwordInput="ngModel"
+                  >
+                  <button 
+                    type="button" 
+                    class="password-toggle"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    {{showPassword ? '👁️' : '🙈'}}
+                  </button>
+                </div>
+                <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
+                  <span *ngIf="passwordInput.errors?.['required']">Password is required</span>
+                  <span *ngIf="passwordInput.errors?.['minlength']">Password must be at least 6 characters</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="checkbox-group">
+                  <input 
+                    type="checkbox" 
+                    id="rememberMe" 
+                    [(ngModel)]="loginData.rememberMe"
+                    name="rememberMe"
+                  >
+                  <label for="rememberMe" class="checkbox-label">Remember me</label>
+                </div>
+                <a href="#" class="forgot-link" (click)="forgotPassword()">Forgot Password?</a>
+              </div>
+
+              <button 
+                type="submit" 
+                class="auth-btn primary"
+                [disabled]="loginForm.invalid || isLoading"
+              >
+                <span class="btn-content" *ngIf="!isLoading">
+                  <span class="btn-icon">🚀</span>
+                  Sign In
+                </span>
+                <span class="loading-spinner" *ngIf="isLoading"></span>
+              </button>
+            </form>
+
+            <div class="divider">
+              <span class="divider-text">or continue with</span>
+            </div>
+
+            <div class="social-login">
+             
+              <button class="social-btn google" (click)="socialLogin('google')">
+                <span class="social-icon">🔍</span>
+                Google
+              </button> 
+              <button class="social-btn facebook" (click)="socialLogin('facebook')">
+                <span class="social-icon">📘</span>
+                Facebook
+              </button>
+              <button class="social-btn apple" (click)="socialLogin('apple')">
+                <span class="social-icon">🍎</span>
+                Apple
+              </button>
+            </div>
+          </div>
+
+          <!-- Signup Form -->
+          <div class="auth-form" [class.hidden]="isLoginMode" *ngIf="!isLoginMode">
+            <div class="form-header">
+              <h2 class="form-title">Create Account</h2>
+              <p class="form-subtitle">Join StyleHub and discover amazing deals</p>
+            </div>
+
+            <form class="signup-form" (ngSubmit)="onSignup()" #signupForm="ngForm">
+              <div class="form-row">
+                <div class="form-group half">
+                  <label class="form-label">First Name</label>
+                  <div class="input-group">
+                    <span class="input-icon">👤</span>
+                    <input 
+                      type="text" 
+                      class="form-input"
+                      placeholder="First name"
+                      [(ngModel)]="signupData.firstName"
+                      name="firstName"
+                      required
+                      #firstNameInput="ngModel"
+                    >
+                  </div>
+                  <div class="error-message" *ngIf="firstNameInput.invalid && firstNameInput.touched">
+                    First name is required
+                  </div>
+                </div>
+
+                <div class="form-group half">
+                  <label class="form-label">Last Name</label>
+                  <div class="input-group">
+                    <span class="input-icon">👤</span>
+                    <input 
+                      type="text" 
+                      class="form-input"
+                      placeholder="Last name"
+                      [(ngModel)]="signupData.lastName"
+                      name="lastName"
+                      required
+                      #lastNameInput="ngModel"
+                    >
+                  </div>
+                  <div class="error-message" *ngIf="lastNameInput.invalid && lastNameInput.touched">
+                    Last name is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="input-group">
+                  <span class="input-icon">📧</span>
+                  <input 
+                    type="email" 
+                    class="form-input"
+                    placeholder="Enter your email"
+                    [(ngModel)]="signupData.email"
+                    name="signupEmail"
+                    required
+                    email
+                    #signupEmailInput="ngModel"
+                  >
+                </div>
+                <div class="error-message" *ngIf="signupEmailInput.invalid && signupEmailInput.touched">
+                  <span *ngIf="signupEmailInput.errors?.['required']">Email is required</span>
+                  <span *ngIf="signupEmailInput.errors?.['email']">Please enter a valid email</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-icon">🔒</span>
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-input"
+                    placeholder="Create password"
+                    [(ngModel)]="signupData.password"
+                    name="signupPassword"
+                    required
+                    minlength="8"
+                    #signupPasswordInput="ngModel"
+                    (input)="checkPasswordStrength()"
+                  >
+                  <button 
+                    type="button" 
+                    class="password-toggle"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    {{showPassword ? '👁️' : '🙈'}}
+                  </button>
+                </div>
+                <div class="password-strength" *ngIf="signupData.password">
+                  <div class="strength-bar">
+                    <div class="strength-fill" [class]="passwordStrength.class" [style.width.%]="passwordStrength.width"></div>
+                  </div>
+                  <span class="strength-text">{{passwordStrength.text}}</span>
+                </div>
+                <div class="error-message" *ngIf="signupPasswordInput.invalid && signupPasswordInput.touched">
+                  <span *ngIf="signupPasswordInput.errors?.['required']">Password is required</span>
+                  <span *ngIf="signupPasswordInput.errors?.['minlength']">Password must be at least 8 characters</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <div class="input-group">
+                  <span class="input-icon">🔒</span>
+                  <input 
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    class="form-input"
+                    placeholder="Confirm password"
+                    [(ngModel)]="signupData.confirmPassword"
+                    name="confirmPassword"
+                    required
+                    #confirmPasswordInput="ngModel"
+                  >
+                  <button 
+                    type="button" 
+                    class="password-toggle"
+                    (click)="toggleConfirmPasswordVisibility()"
+                  >
+                    {{showConfirmPassword ? '👁️' : '🙈'}}
+                  </button>
+                </div>
+                <div class="error-message" *ngIf="confirmPasswordInput.touched && !passwordsMatch()">
+                  Passwords do not match
+                </div>
+              </div>
+
+              <div class="checkbox-group">
+                <input 
+                  type="checkbox" 
+                  id="agreeToTerms" 
+                  [(ngModel)]="signupData.agreeToTerms"
+                  name="agreeToTerms"
+                  required
+                >
+                <label for="agreeToTerms" class="checkbox-label">
+                  I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                </label>
+              </div>
+
+              <button 
+                type="submit" 
+                class="auth-btn primary"
+                [disabled]="signupForm.invalid || !passwordsMatch() || isLoading"
+              >
+                <span class="btn-content" *ngIf="!isLoading">
+                  <span class="btn-icon">✨</span>
+                  Create Account
+                </span>
+                <span class="loading-spinner" *ngIf="isLoading"></span>
+              </button>
+            </form>
+
+            <div class="divider">
+              <span class="divider-text">or continue with</span>
+            </div>
+
+            <div class="social-login">
+              <button class="social-btn google" (click)="socialLogin('google')">
+                <span class="social-icon">🔍</span>
+                Google
+              </button>
+              <button class="social-btn facebook" (click)="socialLogin('facebook')">
+                <span class="social-icon">📘</span>
+                Facebook
+              </button>
+              <button class="social-btn apple" (click)="socialLogin('apple')">
+                <span class="social-icon">🍎</span>
+                Apple
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" [class.show]="showSuccessMessage">
+          <div class="success-content">
+            <span class="success-icon">✅</span>
+            <h3>{{successTitle}}</h3>
+            <p>{{successMessage}}</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="auth-footer">
+        <p>&copy; 2025 StyleHub. All rights reserved.</p>
+      </footer>
+    </div>

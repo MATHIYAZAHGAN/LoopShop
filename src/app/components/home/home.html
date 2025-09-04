@@ -1,0 +1,241 @@
+<div class="ecommerce-app">
+      <!-- Header -->
+      <header class="header">
+        <div class="container">
+          <nav class="navbar">
+            <div class="nav-brand">
+              <h1 class="logo">LoopShop</h1>
+            </div>
+            
+            <div class="nav-search">
+              <div class="search-container">
+                <input 
+                  type="text" 
+                  placeholder="Search products, brands and more..."
+                  class="search-input"
+                  [(ngModel)]="searchQuery"
+                >
+                <button class="search-btn">
+                  <i class="search-icon">🔍</i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="nav-actions">
+              <button class="nav-btn">
+                <span class="icon">❤️</span>
+                <span class="label">Wishlist</span>
+              </button>
+              <button class="nav-btn">
+                <span class="icon">🛒</span>
+                <span class="label">Cart</span>
+                <span class="badge">3</span>
+              </button>
+              <div class="profile-wrapper">
+                <button class="nav-btn profile-btn" (click)="toggleAccountCard()">
+                  <span class="icon">👤</span>
+                  <span class="label">Account</span>
+                </button>
+                <div class="account-card" *ngIf="isCardOpen">
+                  <ng-container *ngIf="isLoggedIn; else loginTemplate">
+                    <h3>Welcome, {{ user.name }}</h3>
+                    <p>Email: {{ user.email }}</p>
+                    <button (click)="logout()">Logout</button>
+                  </ng-container>
+                  <ng-template #loginTemplate>
+                    <h3>Please log in</h3>
+                    <button (click)="login()">Login</button>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+            
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </nav>
+          
+          <nav class="main-nav" [class.active]="isMobileMenuOpen">
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">Men</a>
+            <a href="#" class="nav-link">Women</a>
+            <a href="#" class="nav-link">Kids</a>
+            <a href="#" class="nav-link">Electronics</a>
+            <a href="#" class="nav-link">Home & Living</a>
+            <a href="#" class="nav-link">Beauty</a>
+            <a href="#" class="nav-link">Sports</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-slider">
+          <div class="hero-slide active">
+            <div class="hero-content">
+              <div class="container">
+                <div class="hero-text">
+                  <h2 class="hero-title">New Collection 2025</h2>
+                  <p class="hero-subtitle">Discover the latest trends in fashion with up to 70% off</p>
+                  <button class="cta-btn">Shop Now</button>
+                </div>
+              </div>
+            </div>
+            <div class="hero-image">
+              <div class="hero-bg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section class="categories">
+        <div class="container">
+          <h2 class="section-title">Shop by Category</h2>
+          <div class="categories-grid">
+            <div 
+              *ngFor="let category of categories" 
+              class="category-card"
+              (click)="selectCategory(category)"
+            >
+              <div class="category-image">
+                <div class="category-bg" [style.background-color]="category.image"></div>
+                <span class="category-icon">{{getCategoryIcon(category.name)}}</span>
+              </div>
+              <h3 class="category-name">{{category.name}}</h3>
+              <p class="category-count">{{category.itemCount}} items</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Products -->
+      <section class="featured-products">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Featured Products</h2>
+            <div class="filter-tabs">
+              <button 
+                *ngFor="let tab of filterTabs" 
+                class="filter-tab"
+                [class.active]="activeTab === tab"
+                (click)="setActiveTab(tab)"
+              >
+                {{tab}}
+              </button>
+            </div>
+          </div>
+          
+          <div class="products-grid">
+            <div 
+              *ngFor="let product of getFilteredProducts()" 
+              class="product-card"
+              (click)="viewProduct(product)"
+            >
+              <div class="product-image">
+                <div class="product-bg" [style.background-color]="product.image"></div>
+                <div class="product-actions">
+                  <button class="action-btn" (click)="$event.stopPropagation(); addToWishlist(product)">
+                    <span>❤️</span>
+                  </button>
+                  <button class="action-btn" (click)="$event.stopPropagation(); quickView(product)">
+                    <span>👁️</span>
+                  </button>
+                </div>
+                <span *ngIf="product.badge" class="product-badge">{{product.badge}}</span>
+              </div>
+              
+              <div class="product-info">
+                <h3 class="product-name">{{product.name}}</h3>
+                <div class="product-rating">
+                  <div class="stars">
+                    <span *ngFor="let star of getStars(product.rating)" class="star">⭐</span>
+                  </div>
+                  <span class="reviews">({{product.reviews}})</span>
+                </div>
+                <div class="product-price">
+                  <span class="current-price">${{product.price}}</span>
+                  <span *ngIf="product.originalPrice" class="original-price">${{product.originalPrice}}</span>
+                </div>
+                <button class="add-to-cart-btn" (click)="$event.stopPropagation(); addToCart(product)">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter -->
+      <section class="newsletter">
+        <div class="container">
+          <div class="newsletter-content">
+            <h2 class="newsletter-title">Stay in the Loop</h2>
+            <p class="newsletter-subtitle">Get the latest updates on new products and exclusive offers</p>
+            <div class="newsletter-form">
+              <input 
+                type="email" 
+                placeholder="Enter your email address"
+                class="newsletter-input"
+                [(ngModel)]="newsletterEmail"
+              >
+              <button class="newsletter-btn" (click)="subscribeNewsletter()">Subscribe</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-section">
+              <h3 class="footer-title">StyleHub</h3>
+              <p class="footer-text">Your one-stop destination for fashion and lifestyle products.</p>
+              <div class="social-links">
+                <a href="#" class="social-link">📘</a>
+                <a href="#" class="social-link">📷</a>
+                <a href="#" class="social-link">🐦</a>
+                <a href="#" class="social-link">📺</a>
+              </div>
+            </div>
+            
+            <div class="footer-section">
+              <h4 class="footer-subtitle">Customer Service</h4>
+              <ul class="footer-links">
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping Info</a></li>
+                <li><a href="#">Returns</a></li>
+              </ul>
+            </div>
+            
+            <div class="footer-section">
+              <h4 class="footer-subtitle">Quick Links</h4>
+              <ul class="footer-links">
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Careers</a></li>
+              </ul>
+            </div>
+            
+            <div class="footer-section">
+              <h4 class="footer-subtitle">Categories</h4>
+              <ul class="footer-links">
+                <li><a href="#">Fashion</a></li>
+                <li><a href="#">Electronics</a></li>
+                <li><a href="#">Home & Garden</a></li>
+                <li><a href="#">Sports</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="footer-bottom">
+            <p>&copy; 2025 StyleHub. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
